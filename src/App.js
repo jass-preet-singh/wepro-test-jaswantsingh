@@ -1,23 +1,23 @@
-import logo from './logo.svg';
+import React from 'react';
+import { Route, Routes } from 'react-router-dom';
+import RestaurantList from './components/RestaurantList';
+import RestaurantDetails from './components/RestaurantDetails';
+import Navbar from './components/shared/Navbar';
 import './App.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import Banner from './components/shared/Banner';
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Navbar />
+      <Banner />
+      <div className='container mt-3'>
+        <Routes>
+          <Route path='/' element={<RestaurantList />} />
+          <Route path='/restaurant-details' element={<RestaurantDetails />} />
+        </Routes>
+      </div>
     </div>
   );
 }

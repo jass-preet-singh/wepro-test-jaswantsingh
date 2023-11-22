@@ -9,16 +9,18 @@ const RestaurantList = () => {
   const [restaurants, setRestaurants] = useState([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(3);
+  const [rowsPerPage, setRowsPerPage] = useState(6);
 
   useEffect(() => {
     const fetchRestaurants = async () => {
+      setLoading(true)
       try {
         const response = await fetchRestaurantList();
         setRestaurants(response.data);
       } catch (error) {
-        console.error('Error fetching restaurant list:', error);
+        console.error('Error:', error);
       }
+      setLoading(false)
     };
 
     fetchRestaurants();
@@ -37,11 +39,9 @@ const RestaurantList = () => {
     <div className='container-box'>
 
       {loading ? (
-        <tr>
-          <td colSpan="5" className="text-center">
-            <strong>Loading...</strong>
-          </td>
-        </tr>
+        <div className="text-center">
+          <strong>Loading...</strong>
+        </div>
       ) : restaurants?.length > 0 ? (
         <div className='row'>
           {restaurants?.slice((page - 1) * rowsPerPage, page * rowsPerPage).map((restaurant, index) => (
@@ -51,23 +51,27 @@ const RestaurantList = () => {
           ))}
         </div>
       ) : (
-        <tr>
-          <td colSpan="5" className="text-center">
-            <strong>Records not found</strong>
-          </td>
-        </tr>
+        <div className="text-center">
+          <strong>Records not found</strong>
+        </div>
       )}
-      <div className=' d-flex justify-content-end align-items-center'>
-        <span >Items per page:</span>
-        <Select className='ms-2' value={rowsPerPage} onChange={handleChangeRowsPerPage}>
-          <MenuItem value={3}>3</MenuItem>
-          <MenuItem value={12}>12</MenuItem>
-          <MenuItem value={21}>21</MenuItem>
-        </Select>
-      </div>
-      <div className='pagination-box d-flex justify-content-center mt-3 mb-5'>
-        <Pagination count={Math.ceil(restaurants.length / rowsPerPage)} page={page} color="primary" onChange={handleChangePage} />
-      </div>
+
+      {!loading && restaurants?.length > 0 && (
+        <>
+          <div className=' d-flex justify-content-end align-items-center'>
+            <span >Items per page:</span>
+            <Select className='ms-2' value={rowsPerPage} onChange={handleChangeRowsPerPage}>
+              <MenuItem value={6}>6</MenuItem>
+              <MenuItem value={12}>12</MenuItem>
+              <MenuItem value={30}>30</MenuItem>
+            </Select>
+          </div>
+          <div className='pagination-box d-flex justify-content-center mt-3 mb-5'>
+            <Pagination count={Math.ceil(restaurants.length / rowsPerPage)} page={page} color="primary" onChange={handleChangePage} />
+          </div>
+        </>
+      )
+      }
     </div>
   );
 };

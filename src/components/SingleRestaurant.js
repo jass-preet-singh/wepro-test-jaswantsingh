@@ -11,8 +11,16 @@ import { red } from '@mui/material/colors';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Rating from '@mui/material/Rating';
+import { useDispatch, useSelector } from 'react-redux';
+import { Add_Remove_Favorite } from '../redux/reducers/favorites';
 
 const SingleRestaurant = ({ restaurant }) => {
+  const dispatch = useDispatch();
+  const favorites = useSelector((state) => state.favorites);
+
+  const handleToggleFavorite = (id) => {
+    dispatch(Add_Remove_Favorite(id));
+  };
 
   return (
     <Card sx={{ maxWidth: 345 }}>
@@ -44,8 +52,8 @@ const SingleRestaurant = ({ restaurant }) => {
         </Typography>
       </CardContent>
       <CardActions disableSpacing className='d-flex justify-content-between'>
-        <IconButton aria-label="add to favorites">
-          <FavoriteIcon />
+        <IconButton aria-label={favorites.includes(restaurant.id) ? 'Remove from Favorites' : 'Add to Favorites'}>
+          <FavoriteIcon onClick={() => handleToggleFavorite(restaurant.id)} color={favorites.includes(restaurant.id) ? "error" : "disabled"} />
         </IconButton>
         <IconButton aria-label="share">
           <Rating

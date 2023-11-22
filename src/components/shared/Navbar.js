@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { styled, alpha } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -6,8 +6,11 @@ import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import InputBase from '@mui/material/InputBase';
-import MenuIcon from '@mui/icons-material/Menu';
+import FavoriteIcon from '@mui/icons-material/Favorite';
 import SearchIcon from '@mui/icons-material/Search';
+import Badge from '@mui/material/Badge';
+import { useSelector } from 'react-redux';
+import Favorites from '../Favorites';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -38,7 +41,6 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   color: 'inherit',
   '& .MuiInputBase-input': {
     padding: theme.spacing(1, 1, 1, 0),
-    // vertical padding + font size from searchIcon
     paddingLeft: `calc(1em + ${theme.spacing(4)})`,
     transition: theme.transitions.create('width'),
     width: '100%',
@@ -51,7 +53,20 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-const Navbar = () => {
+const Navbar = ({ openFavouriteListPopup }) => {
+  const [isPopupOpen, setPopupOpen] = useState(false);
+  const favorites = useSelector((state) => state.favorites);
+
+  const openPopup = () => {
+    if (favorites?.length > 0) {
+      setPopupOpen(true);
+    }
+  };
+
+  const closePopup = () => {
+    setPopupOpen(false);
+  };
+
   return (
     <Box sx={{ flexGrow: 1 }} >
       <AppBar position="static" className='navbar-box'>
@@ -82,8 +97,12 @@ const Navbar = () => {
               inputProps={{ 'aria-label': 'search' }}
             />
           </Search>
+          <Badge onClick={openPopup} badgeContent={favorites?.length} color="primary" className='ms-3'>
+            <FavoriteIcon onClick={openFavouriteListPopup} />
+          </Badge>
         </Toolbar>
       </AppBar>
+      <Favorites isOpen={isPopupOpen} onClose={closePopup} />
     </Box>
 
   )

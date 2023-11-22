@@ -9,8 +9,13 @@ import InputBase from '@mui/material/InputBase';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import SearchIcon from '@mui/icons-material/Search';
 import Badge from '@mui/material/Badge';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Favorites from '../Favorites';
+import { setSearch } from '../../redux/reducers/searchSlice';
+import { Divider, MenuItem, Select } from '@mui/material';
+import FilterAltIcon from '@mui/icons-material/FilterAlt';
+import Menu from '@mui/material/Menu';
+import { setMaxRating, setSortOrder } from '../../redux/reducers/filterSlice';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -53,10 +58,17 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-const Navbar = ({ openFavouriteListPopup }) => {
+const Navbar = () => {
+  const dispatch = useDispatch();
   const [isPopupOpen, setPopupOpen] = useState(false);
+  const [isMenuOpen, setMenuOpen] = useState(false);
   const favorites = useSelector((state) => state.favorites);
+  const searchQuery = useSelector((state) => state.selectSearch);
+  const filters = useSelector((state) => state.filters);
 
+  const handleSearchChange = (event) => {
+    dispatch(setSearch(event.target.value));
+  };
   const openPopup = () => {
     if (favorites?.length > 0) {
       setPopupOpen(true);
@@ -65,6 +77,17 @@ const Navbar = ({ openFavouriteListPopup }) => {
 
   const closePopup = () => {
     setPopupOpen(false);
+  };
+  const handleCloseMenu = () => {
+    setMenuOpen(false);
+  };
+
+  const handleSortOrderChange = (e) => {
+    dispatch(setSortOrder(e.target.value));
+  };
+
+  const handleMaxRatingChange = (e) => {
+    dispatch(setMaxRating(e.target.value));
   };
 
   return (
@@ -94,15 +117,48 @@ const Navbar = ({ openFavouriteListPopup }) => {
             </SearchIconWrapper>
             <StyledInputBase
               placeholder="Search…"
+              value={searchQuery}
+              onChange={(e) => { handleSearchChange(e) }}
               inputProps={{ 'aria-label': 'search' }}
             />
           </Search>
-          <Badge onClick={openPopup} badgeContent={favorites?.length} color="primary" className='ms-3'>
-            <FavoriteIcon onClick={openFavouriteListPopup} />
+          <Badge onClick={() => { openPopup() }} badgeContent={favorites?.length} color="primary" className='mx-3'>
+            <FavoriteIcon />
           </Badge>
+          <IconButton aria-label="">
+            <FilterAltIcon className='text-white' onClick={() => { setMenuOpen(!isMenuOpen) }} />
+          </IconButton>
+          <Menu
+          className='filter-menu'
+            open={isMenuOpen}
+            onClose={handleCloseMenu}
+            MenuListProps={{
+              'aria-labelledby': 'basic-button',
+            }}
+          >
+            <div className='px-3 mb-2'>
+              <span>Sort Order:</span>
+              <Select className='ms-2' value={filters.sortOrder} onChange={handleSortOrderChange}>
+                <MenuItem value='asc'>Asc</MenuItem>
+                <MenuItem value='desc'>Desc</MenuItem>
+              </Select>
+            </div>
+            <Divider />
+            <div className='px-3'>
+              <span>Max Rating:</span>
+              <Select className='ms-2' value={filters.maxRating} onChange={handleMaxRatingChange}>
+                <MenuItem value={null}>None</MenuItem>
+                <MenuItem value={5}>5</MenuItem>
+                <MenuItem value={4}>4</MenuItem>
+                <MenuItem value={3}>3</MenuItem>
+                <MenuItem value={2}>2</MenuItem>
+                <MenuItem value={1}>1</MenuItem>
+              </Select>
+            </div>
+          </Menu>
         </Toolbar>
       </AppBar>
-      <Favorites isOpen={isPopupOpen} onClose={closePopup} />
+      <Favorites isOpen={isPopupOpen} onClose={() => { closePopup() }} />
     </Box>
 
   )
